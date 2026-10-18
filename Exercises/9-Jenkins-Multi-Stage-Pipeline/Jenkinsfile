@@ -4,7 +4,7 @@ pipeline {
 
     environment {
         VENV = "${WORKSPACE}/.venv"
-        APP_DIR = "${WORKSPACE}/python-flask-app"
+        APP_DIR = "${WORKSPACE}/Exercises/9-Jenkins-Multi-Stage-Pipeline/python-flask-app"
         DEPLOY_DIR = "${WORKSPACE}/python-app-deploy"
     }
 
