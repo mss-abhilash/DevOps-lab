@@ -1,0 +1,57 @@
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Installing Python dependencies...'
+                sh '''
+                    python3 --version
+                    python3 -m pip install --user -r python-flask-app/requirements.txt
+                '''
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Running unit tests...'
+                sh '''
+                    cd python-flask-app
+                    python3 -m unittest discover -s .
+                '''
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying application to a mock directory...'
+                sh '''
+                    mkdir -p "$WORKSPACE/python-app-deploy"
+                    cp python-flask-app/app.py "$WORKSPACE/python-app-deploy/"
+                    cp python-flask-app/requirements.txt "$WORKSPACE/python-app-deploy/"
+                '''
+            }
+        }
+
+        stage('Test Application') {
+            steps {
+                echo 'Verifying the deployed application...'
+                sh '''
+                    python3 -m py_compile "$WORKSPACE/python-app-deploy/app.py"
+                    test -f "$WORKSPACE/python-app-deploy/requirements.txt"
+                    echo 'Deployed application files verified.'
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Check the logs for more details.'
+        }
+    }
+}
